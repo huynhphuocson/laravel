@@ -1,0 +1,56 @@
+Quy trình xây dựng Website bằng laravel
+
+Bước 1 - Phân tích dự án 
+---------------------------- Chuẩn bị cho Database + Model -------------------------
+Bước 2 - Tạo Database bằng phpMyAdmin
+Bước 3 - Xây dựng các bàng dữ liệu
+	Cách 1 : Tạo bằng phpMyAdmin
+	Cách 2 : Tạo bằng migrate trong laravel
+		- Lệnh tạo Migrate: php artisan make:migration create_product_table --create=product
+		- Thực thi lệnh Migrate: php artisan migrate
+		- database/migrations/...product.php
+Bước 4 - Xây dựng Model
+		- Lệnh tạo Model : php artisan make:model Product
+		- app/Product.php
+		- khai báo bảng và cột có thể xử lý
+			protected $table = 'product';
+			protected $guarded = [];
+Bước 5 - Tạo dữ liệu mẫu bằng Seeder (nếu cần)
+			- Lệnh tạo Seeder : php artisan make:seeder ProductTableSeeder
+			- database/seeds/ProductTableSeeder.php
+			- public function run()
+			{
+				DB::table('product')->insert([
+					[
+						'name' => 'Sản phẩm 1',
+					],
+					[
+						'name' => 'Sản phẩm 2',
+					],
+					[
+						'name' => 'Sản phẩm 3',
+					],
+					[
+						'name' => 'Sản phẩm 4',
+					],
+				]);
+			}
+			- Gọi Class cần thực thi trong DatabaseSeeder : $this->call(ProductTableSeeder::class);
+			- Lệnh thực thi : php artisan db:seed
+--------------------------------------------- Xây dựng chức năng ------------------------------
+Bước 6 : - Xây dựng View để nhận lấy dữ lệu (có thể dùng Blade Template)
+			- resources/views/product.blade.php
+Bước 7 : - Tạo Controller dể quản lý các chức năng và trả giá trị cho View nếu cần
+			- Lệnh tạo Controller : php artisan make:controller ProductController
+			- app/Http/Controller/ProductController
+			- thêm Model vào Controller : use app\Product;
+			- xây dựng phương thức để lấy dữ liệu từ model và trả ra view
+				public function getProduct () {
+					$data = Product::select('id','name')->get()->toArray();
+					return view('product',['product_data' => $data]);
+				}
+Bước 8 : - Tạo Router để điểu hướng các controller cũng như các phương thức
+			- app/Http/routes.php
+			- Route::get('san-pham',['as' => 'getProduct', 'uses' => 'ProductController@getProduct']);
+																		(tên controller)@(tên phương thức)
+Bước 9 : - Kiểm tra kết quả
